@@ -52,7 +52,7 @@ private:
     Rectangle sprite_source() const {
         switch (sprite_i) {
             case Boy1:
-                return Rectangle { 7, 2, 1, 2 };
+                return Rectangle { 7, 4, 1, 2 };
         }
     }
 };
