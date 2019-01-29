@@ -45,6 +45,7 @@ public:
     };
 
     Sprite(SpriteIDX sprite_i) : sprite_i(sprite_i), orientation(Right) {}
+    Sprite(SpriteIDX s, Orientation o) : sprite_i(s), orientation(o) {}
 
     void draw(const SpriteSheet& sheet, Vector2 pos) const {
         Rectangle px_source = sprite_source();
