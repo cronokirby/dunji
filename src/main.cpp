@@ -39,15 +39,24 @@ public:
         Boy1
     };
 
-    Sprite(SpriteIDX sprite_i) : sprite_i(sprite_i) {}
+    enum Orientation {
+        Left,
+        Right
+    };
+
+    Sprite(SpriteIDX sprite_i) : sprite_i(sprite_i), orientation(Right) {}
 
     void draw(const SpriteSheet& sheet, Vector2 pos) const {
         Rectangle px_source = sprite_source();
+        if (orientation == Left) {
+            px_source.y += 2;
+        }
         sheet.draw(px_source, pos);
     }
 
 private:
     SpriteIDX sprite_i;
+    Orientation orientation;
 
     Rectangle sprite_source() const {
         switch (sprite_i) {
