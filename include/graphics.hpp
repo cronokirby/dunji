@@ -1,7 +1,10 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
-#include "../include/raylib.h"
+// Forward declarations from raylib
+class Rectangle;
+class Texture2d;
+class Vector2;
 
 
 class SpriteSheet {
