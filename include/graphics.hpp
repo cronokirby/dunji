@@ -39,8 +39,6 @@ public:
 private:
     SpriteIDX sprite_i;
     Orientation orientation;
-
-    Rectangle sprite_source() const;
 };
 
 #endif

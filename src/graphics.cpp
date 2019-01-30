@@ -28,17 +28,17 @@ void SpriteSheet::draw(Rectangle px_source, Vector2 pos) const {
 Sprite::Sprite(SpriteIDX s, Orientation o) : sprite_i(s), orientation(o) {}
 Sprite::Sprite(SpriteIDX sprite_i) : Sprite::Sprite(sprite_i, Right) {}
 
+Rectangle sprite_source(const Sprite::SpriteIDX sprite) {
+    switch (sprite) {
+        case Sprite::Boy1:
+            return Rectangle { 7, 4, 1, 2 };
+    }
+}
+
 void Sprite::draw(const SpriteSheet& sheet, Vector2 pos) const {
-    Rectangle px_source = sprite_source();
+    Rectangle px_source = sprite_source(sprite_i);
     if (orientation == Left) {
         px_source.y += 2;
     }
     sheet.draw(px_source, pos);
-}
-
-Rectangle Sprite::sprite_source() const {
-    switch (sprite_i) {
-        case Boy1:
-            return Rectangle { 7, 4, 1, 2 };
-    }
 }
