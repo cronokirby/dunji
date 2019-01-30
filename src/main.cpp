@@ -1,4 +1,5 @@
 #include <iostream>
+#include <math.h>
 #include "../include/raylib.h"
 
 #include "../include/graphics.hpp"
@@ -8,17 +9,28 @@ class Player {
     Vector2 pos;
     Sprite sprite;
 public:
-    Player() : sprite(Sprite::Boy1), pos(Vector2 { 0, 0 }) {}
+    Player() : sprite(Sprite::Boy1), pos(Vector2 { 100, 100 }) {}
     
     void update(float dT) {
+        Vector2 direction { 0, 0 };
         if (IsKeyDown(KEY_A)) {
-            pos.x -= 200 * dT;
-        } else if (IsKeyDown(KEY_W)) {
-            pos.y -= 200 * dT;
+            direction.x = -1;
+            sprite.orientation = Sprite::Left;
         } else if (IsKeyDown(KEY_D)) {
-            pos.x += 200 * dT;
+            direction.x = 1;
+            sprite.orientation = Sprite::Right;
+        }
+        if (IsKeyDown(KEY_W)) {
+            direction.y = -1;
         } else if (IsKeyDown(KEY_S)) {
-            pos.y += 200 * dT;
+            direction.y = 1;
+        }
+        float length = sqrt(direction.x * direction.x + direction.y * direction.y);
+        float stretch = 200 * dT / length;
+        // This is mainly to avoid the case where the length is 0, and we blow up
+        if (length >= 1) {
+            pos.x += direction.x *= stretch;
+            pos.y += direction.y *= stretch;
         }
     }
 

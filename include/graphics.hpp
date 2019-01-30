@@ -20,8 +20,7 @@ public:
 // A Sprite we can draw. 
 // Only a finite number of sprites are available,
 // So the interior enum should be preferred to construct one.
-class Sprite {
-public:
+struct Sprite {
     enum SpriteIDX {
         Boy1
     };
@@ -31,14 +30,13 @@ public:
         Right
     };
 
+    SpriteIDX sprite_i;
+    Orientation orientation;
+    
     Sprite(SpriteIDX sprite_i);
     Sprite(SpriteIDX s, Orientation o);
 
     void draw(const SpriteSheet& sheet, Vector2 pos) const;
-
-private:
-    SpriteIDX sprite_i;
-    Orientation orientation;
 };
 
 #endif
