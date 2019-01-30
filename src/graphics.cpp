@@ -30,8 +30,24 @@ Sprite::Sprite(SpriteIDX sprite_i) : Sprite::Sprite(sprite_i, Right) {}
 
 Rectangle sprite_source(const Sprite::SpriteIDX sprite) {
     switch (sprite) {
-        case Sprite::Boy1:
+        case Sprite::Boy0:
             return Rectangle { 7, 4, 1, 2 };
+        case Sprite::Boy1:
+            return Rectangle { 8, 4, 1, 2 };
+        case Sprite::Boy2:
+            return Rectangle { 9, 4, 1, 2 };
+        case Sprite::Boy3:
+            return Rectangle { 10, 4, 1, 2 };
+        case Sprite::Boy4:
+            return Rectangle { 11, 4, 1, 2 };
+        case Sprite::Boy5:
+            return Rectangle { 12, 4, 1, 2 };
+        case Sprite::Boy6:
+            return Rectangle { 13, 4, 1, 2 };
+        case Sprite::Boy7:
+            return Rectangle { 14, 4, 1, 2 };
+        case Sprite::Boy8:
+            return Rectangle { 15, 4, 1, 2 };
     }
 }
 

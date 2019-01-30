@@ -22,7 +22,7 @@ public:
 // So the interior enum should be preferred to construct one.
 struct Sprite {
     enum SpriteIDX {
-        Boy1
+        Boy0, Boy1, Boy2, Boy3, Boy4, Boy5, Boy6, Boy7, Boy8
     };
 
     enum Orientation {

@@ -5,11 +5,25 @@
 #include "../include/graphics.hpp"
 
 
+Sprite::SpriteIDX next_player_walk(Sprite::SpriteIDX player_sprite) {
+    switch (player_sprite) {
+        case Sprite::Boy4:
+            return Sprite::Boy5;
+        case Sprite::Boy5:
+            return Sprite::Boy6;
+        case Sprite::Boy6:
+            return Sprite::Boy7;
+        default:
+            return Sprite::Boy4;
+    }
+}
+
 class Player {
     Vector2 pos;
     Sprite sprite;
+    int walk_timer;
 public:
-    Player() : sprite(Sprite::Boy1), pos(Vector2 { 100, 100 }) {}
+    Player() : sprite(Sprite::Boy1), pos(Vector2 { 100, 100 }), walk_timer(0) {}
     
     void update(float dT) {
         Vector2 direction { 0, 0 };
@@ -26,11 +40,20 @@ public:
             direction.y = 1;
         }
         float length = sqrt(direction.x * direction.x + direction.y * direction.y);
-        float stretch = 200 * dT / length;
+        float stretch = 300 * dT / length;
         // This is mainly to avoid the case where the length is 0, and we blow up
         if (length >= 1) {
             pos.x += direction.x *= stretch;
             pos.y += direction.y *= stretch;
+
+            if (walk_timer >= 5) {
+                sprite.sprite_i = next_player_walk(sprite.sprite_i);
+                walk_timer = 0;
+            }
+            walk_timer += 1;
+        } else {
+            walk_timer = 0;
+            sprite.sprite_i = Sprite::Boy1;
         }
     }
 
@@ -41,9 +64,9 @@ public:
 
 
 int main() {
-    InitWindow(1024, 768, "Hello World");
+    InitWindow(1024, 768, "Dunji");
 
-    SpriteSheet sheet(2, "../res/dunji-sheet.png");
+    SpriteSheet sheet(3, "../res/dunji-sheet.png");
     Player player {};
 
     SetTargetFPS(60);
