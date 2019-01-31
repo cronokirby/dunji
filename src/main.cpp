@@ -11,15 +11,15 @@ int main() {
 
     SpriteSheet sheet(3, "../res/dunji-sheet.png");
     Player player {};
-    Area a(4, 4);
+    Area area(10, 10);
 
     SetTargetFPS(60);
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(BLACK);
         float dT = GetFrameTime();
-        player.update(dT);
-        a.draw(sheet);
+        player.update(area, dT);
+        area.draw(sheet);
         player.draw(sheet);
         EndDrawing();
     }

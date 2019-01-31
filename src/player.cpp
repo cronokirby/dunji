@@ -1,13 +1,14 @@
 #include <math.h>
 
 #include "../include/raylib.h"
+#include "../include/area.hpp"
 #include "../include/graphics.hpp"
 #include "../include/player.hpp"
 
 
 Player::Player() : 
     sprite(Sprite::Boy1), 
-    pos(Vector2 { 100, 100 }),
+    pos(Vector2 { 0, 0 }),
     walk_timer(0) {}
 
 Sprite::SpriteIDX next_player_walk(Sprite::SpriteIDX player_sprite) {
@@ -24,7 +25,7 @@ Sprite::SpriteIDX next_player_walk(Sprite::SpriteIDX player_sprite) {
 }
 
 
-void Player::update(float dT) {
+void Player::update(const Area& area, float dT) {
     Vector2 direction { 0, 0 };
     if (IsKeyDown(KEY_A)) {
         direction.x = -1;
@@ -40,10 +41,11 @@ void Player::update(float dT) {
     }
     float length = sqrt(direction.x * direction.x + direction.y * direction.y);
     float stretch = 300 * dT / length;
+    auto collision = Rectangle { pos.x, pos.y, 48, 96 };
     // This is mainly to avoid the case where the length is 0, and we blow up
     if (length >= 1) {
-        pos.x += direction.x *= stretch;
-        pos.y += direction.y *= stretch;
+        pos.x += area.allowed_x(direction.x * stretch, collision);
+        pos.y += direction.y * stretch;
 
         if (walk_timer >= 5) {
             sprite.sprite_i = next_player_walk(sprite.sprite_i);

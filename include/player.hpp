@@ -1,9 +1,10 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-class Vector2;
+class Area;
 class Sprite;
 class SpriteSheet;
+class Vector2;
 
 
 class Player {
@@ -13,7 +14,7 @@ class Player {
 public:
     Player();
 
-    void update(float);
+    void update(const Area&, float);
 
     void draw(const SpriteSheet&) const;
 };
