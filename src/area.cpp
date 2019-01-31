@@ -65,6 +65,8 @@ public:
             floor_tiles[i] = Floor::Tile0;
         }
         floor_tiles[21] = Floor::Wall;
+        floor_tiles[22] = Floor::Wall;
+        floor_tiles[32] = Floor::Wall;
     }
 
     ~AreaImpl() {
