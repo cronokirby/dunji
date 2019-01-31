@@ -63,12 +63,10 @@ public:
     void draw(const SpriteSheet& sheet) const {
         for (int y = 0; y < floor_height; ++y) {
             for (int x = 0; x < floor_width; ++x) {
-                std::cout << x << "," << y << " ";
                 auto tile = floor_tiles[y * floor_width + x];
                 draw_floor(sheet, tile, x, y);
             }
         }
-        std::cout << "\n";
     }
 };
 
