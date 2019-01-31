@@ -14,6 +14,7 @@ public:
     SpriteSheet(int scale, const char* file_name);
     ~SpriteSheet();
     void draw(Rectangle px_source, Vector2 pos) const;
+    void draw_pxpos(Rectangle px_source, Vector2 pos) const;
 };
 
 

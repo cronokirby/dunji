@@ -24,6 +24,11 @@ void SpriteSheet::draw(Rectangle px_source, Vector2 pos) const {
     DrawTextureRec(texture, source, pos, WHITE);
 }
 
+void SpriteSheet::draw_pxpos(Rectangle px_source, Vector2 px_pos) const {
+    auto scaled = Vector2 { px_pos.x * px_scale, px_pos.y * px_scale };
+    draw(px_source, scaled);
+}
+
 
 Sprite::Sprite(SpriteIDX s, Orientation o) : sprite_i(s), orientation(o) {}
 Sprite::Sprite(SpriteIDX sprite_i) : Sprite::Sprite(sprite_i, Right) {}
