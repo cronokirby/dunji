@@ -24,6 +24,10 @@ Sprite::SpriteIDX next_player_walk(Sprite::SpriteIDX player_sprite) {
     }
 }
 
+Rectangle player_walk_box(Vector2 pos) {
+    return Rectangle { pos.x + 7, pos.y + 60, 32, 36 };
+}
+
 
 void Player::update(const Area& area, float dT) {
     Vector2 direction { 0, 0 };
@@ -40,8 +44,8 @@ void Player::update(const Area& area, float dT) {
         direction.y = 1;
     }
     float length = sqrt(direction.x * direction.x + direction.y * direction.y);
-    float stretch = 300 * dT / length;
-    auto collision = Rectangle { pos.x, pos.y, 48, 96 };
+    float stretch = 360 * dT / length;
+    auto collision = player_walk_box(pos);
     // This is mainly to avoid the case where the length is 0, and we blow up
     if (length >= 1) {
         pos.x += area.allowed_x(direction.x * stretch, collision);
