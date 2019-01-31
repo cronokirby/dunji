@@ -45,7 +45,7 @@ void Player::update(const Area& area, float dT) {
     // This is mainly to avoid the case where the length is 0, and we blow up
     if (length >= 1) {
         pos.x += area.allowed_x(direction.x * stretch, collision);
-        pos.y += direction.y * stretch;
+        pos.y += area.allowed_y(direction.y * stretch, collision);
 
         if (walk_timer >= 5) {
             sprite.sprite_i = next_player_walk(sprite.sprite_i);

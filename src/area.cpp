@@ -82,13 +82,41 @@ public:
             for (int x = 0; x < floor_width; ++x) {
                 auto tile = floor_tiles[y * floor_width + x];
                 if (tile == Floor::Wall) {
-                    int offset = left ? x + 1 : x - 1;
-                    int delta = abs(offset * 48 - box.x);
-                    distance = std::min(distance, delta);
+                    int delta;
+                    if (left) {
+                        delta = (x + 1) * 48 - box.x;
+                    } else {
+                        delta = x * 48 - (box.x + box.width);
+                    }
+                    distance = std::min(distance, abs(delta));
                 }
             }
         }
         return left ? std::max(x_mov, -distance) : std::min(distance, x_mov);
+    }
+
+    int allowed_y(int y_mov, Rectangle box) const {
+        int min_tile = closest_index(box.x, 48);
+        int max_tile = closest_index(box.x + box.height, 48);
+
+        bool up = y_mov < 0;
+
+        int distance = 1000000;
+        for (int x = min_tile; x <= max_tile; ++x) {
+            for (int y = 0; y < floor_height; ++y) {
+                auto tile = floor_tiles[y * floor_width + x];
+                if (tile == Floor::Wall) {
+                    int delta;
+                    if (up) {
+                        delta = (y + 1) * 48 - box.y;
+                    } else {
+                        delta = y * 48 - (box.y + box.height);
+                    }
+                    distance = std::min(distance, abs(delta));
+                }
+            }
+        }
+        return up ? std::max(y_mov, -distance) : std::min(distance, y_mov);
     }
 
     void draw(const SpriteSheet& sheet) const {
@@ -112,6 +140,10 @@ Area::~Area() {
 
 int Area::allowed_x(int x_mov, Rectangle box) const {
     return pimpl->allowed_x(x_mov, box);
+}
+
+int Area::allowed_y(int y_mov, Rectangle box) const {
+    return pimpl->allowed_y(y_mov, box);
 }
 
 void Area::draw(const SpriteSheet& sheet) const {
