@@ -75,7 +75,7 @@ public:
 
     int allowed_x(int x_mov, Rectangle box) const {
         int min_tile = closest_index(box.y, 48);
-        int max_tile = closest_index(box.y + box.height, 48);
+        int max_tile = closest_index(box.y + box.height - 1, 48);
 
         bool left = x_mov < 0;
 
@@ -99,7 +99,7 @@ public:
 
     int allowed_y(int y_mov, Rectangle box) const {
         int min_tile = closest_index(box.x, 48);
-        int max_tile = closest_index(box.x + box.height, 48);
+        int max_tile = closest_index(box.x + box.height - 1, 48);
 
         bool up = y_mov < 0;
 
