@@ -75,33 +75,20 @@ public:
         int min_tile = closest_index(box.y, 48);
         int max_tile = closest_index(box.y + box.height, 48);
 
+        bool left = x_mov < 0;
+
         int distance = 1000000;
         for (int y = min_tile; y <= max_tile; ++y) {
-            if (x_mov < 0) {
-                for (int x = 0; x < floor_width; ++x) {
-                    auto tile = floor_tiles[y * floor_width + x];
-                    if (tile == Floor::Wall) {
-                        std::cout << x << "\n";
-                        int d = abs((x + 1) * 48 - box.x);
-                        distance = std::min(distance, d);
-                    }
-                 }            
-            } else {
-                for (int x = floor_width - 1; x >= 0; --x) {
-                    auto tile = floor_tiles[y * floor_width + x];
-                    if (tile == Floor::Wall) {
-                        int d = abs((x - 1) * 48 - box.x);
-                        distance = std::min(distance, d);
-                    }
+            for (int x = 0; x < floor_width; ++x) {
+                auto tile = floor_tiles[y * floor_width + x];
+                if (tile == Floor::Wall) {
+                    int offset = left ? x + 1 : x - 1;
+                    int delta = abs(offset * 48 - box.x);
+                    distance = std::min(distance, delta);
                 }
             }
         }
-
-        if (x_mov < 0) {
-            return std::max(x_mov, -distance);
-        } else {
-            return std::min(distance, x_mov);
-        }
+        return left ? std::max(x_mov, -distance) : std::min(distance, x_mov);
     }
 
     void draw(const SpriteSheet& sheet) const {
