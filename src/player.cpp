@@ -8,7 +8,7 @@
 
 Player::Player() : 
     sprite(Sprite::Boy1), 
-    pos(Vector2 { 120, 120 }),
+    pos(Vector2 { 100, 100 }),
     walk_timer(0) {}
 
 Sprite::SpriteIDX next_player_walk(Sprite::SpriteIDX player_sprite) {
@@ -45,11 +45,13 @@ void Player::update(const Area& area, float dT) {
     }
     float length = sqrt(direction.x * direction.x + direction.y * direction.y);
     float stretch = 360 * dT / length;
-    auto collision = player_walk_box(pos);
     // This is mainly to avoid the case where the length is 0, and we blow up
     if (length >= 1) {
-        pos.x += area.allowed_x(direction.x * stretch, collision);
-        pos.y += area.allowed_y(direction.y * stretch, collision);
+        Vector2 try_move { direction.x * stretch, direction.y * stretch };
+        auto collision = player_walk_box(pos);
+        auto move = area.allowed_move(try_move, collision);
+        pos.x += move.x;
+        pos.y += move.y;
 
         if (walk_timer >= 5) {
             sprite.sprite_i = next_player_walk(sprite.sprite_i);

@@ -11,8 +11,7 @@ public:
     Area(int, int);
     ~Area();
 
-    int allowed_x(int, Rectangle) const;
-    int allowed_y(int, Rectangle) const;
+    Vector2 allowed_move(Vector2, Rectangle) const;
     void draw(const SpriteSheet&) const;
 };
 

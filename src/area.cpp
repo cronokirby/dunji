@@ -88,6 +88,17 @@ public:
     }
 
 
+    Vector2 allowed_move(Vector2 mov, Rectangle box) const {
+        if (mov.x != 0) {
+            mov.x = allowed_x(mov.x, box);
+        }
+        if (mov.y != 0) {
+            mov.y = allowed_y(mov.y, box);
+        }
+        return mov;
+    }
+
+
     int allowed_x(int x_mov, Rectangle box) const {
         int min_tile = closest_index(box.y, 48);
         int max_tile = closest_index(box.y + box.height - 1, 48);
@@ -155,12 +166,8 @@ Area::~Area() {
     delete pimpl;
 }
 
-int Area::allowed_x(int x_mov, Rectangle box) const {
-    return pimpl->allowed_x(x_mov, box);
-}
-
-int Area::allowed_y(int y_mov, Rectangle box) const {
-    return pimpl->allowed_y(y_mov, box);
+Vector2 Area::allowed_move(Vector2 move, Rectangle box) const {
+    return pimpl->allowed_move(move, box);
 }
 
 void Area::draw(const SpriteSheet& sheet) const {
