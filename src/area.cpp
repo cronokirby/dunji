@@ -80,6 +80,10 @@ public:
         }
         floor_tiles[27] = Floor::Wall;
         floor_tiles[28] = Floor::Wall;
+        floor_tiles[29] = Floor::Wall;
+        floor_tiles[30] = Floor::Wall;
+        floor_tiles[31] = Floor::Wall;
+        floor_tiles[41] = Floor::Wall;
         floor_tiles[39] = Floor::Wall;
     }
 
@@ -104,47 +108,53 @@ public:
         int max_tile = closest_index(box.y + box.height - 1, 48);
         bool left = x_mov < 0;
 
-        int distance = x_mov;
+        int right_x = box.x + box.width - 1;
+
+        int min_x = closest_index(left ? box.x + x_mov : box.x, 48);
+        int max_x = closest_index(left ? right_x : right_x + x_mov, 48);
         for (int y = min_tile; y <= max_tile; ++y) {
-            for (int x = 0; x < floor_width; ++x) {
+            for (int x = min_x; x <= max_x; ++x) {
                 auto tile = floor_tiles[y * floor_width + x];
                 if (is_wall(tile)) {
                     int delta;
                     if (left) {
                         delta = (x + 1) * 48 - box.x;
-                        distance = std::max(-abs(delta), distance);
+                        x_mov = std::max(-abs(delta), x_mov);
                     } else {
                         delta = x * 48 - (box.x + box.width);
-                        distance = std::min(abs(delta), distance);
+                        x_mov = std::min(abs(delta), x_mov);
                     }
                 }
             }
         }
-        return distance;
+        return x_mov;
     }
 
     int allowed_y(int y_mov, Rectangle box) const {
         int min_tile = closest_index(box.x, 48);
         int max_tile = closest_index(box.x + box.width - 1, 48);
-
         bool up = y_mov < 0;
 
-        int distance = 1000000;
-        for (int x = min_tile; x <= max_tile; ++x) {
-            for (int y = 0; y < floor_height; ++y) {
+        int down_y = box.y + box.height - 1;
+
+        int min_y = closest_index(up ? box.y + y_mov : box.y, 48);
+        int max_y = closest_index(up ? down_y : down_y + y_mov, 48);
+        for (int y = min_y; y <= max_y; ++y) {
+            for (int x = min_tile; x <= max_tile; ++x) {
                 auto tile = floor_tiles[y * floor_width + x];
                 if (is_wall(tile)) {
                     int delta;
                     if (up) {
                         delta = (y + 1) * 48 - box.y;
+                        y_mov = std::max(-abs(delta), y_mov);
                     } else {
                         delta = y * 48 - (box.y + box.height);
+                        y_mov = std::min(abs(delta), y_mov);
                     }
-                    distance = std::min(distance, abs(delta));
                 }
             }
         }
-        return up ? std::max(y_mov, -distance) : std::min(distance, y_mov);
+        return y_mov;
     }
 
     void draw(const SpriteSheet& sheet) const {

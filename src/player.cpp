@@ -44,7 +44,7 @@ void Player::update(const Area& area, float dT) {
         direction.y = 1;
     }
     float length = sqrt(direction.x * direction.x + direction.y * direction.y);
-    float stretch = 360 * dT / length;
+    float stretch = 400 * dT / length;
     // This is mainly to avoid the case where the length is 0, and we blow up
     if (length >= 1) {
         Vector2 try_move { direction.x * stretch, direction.y * stretch };
