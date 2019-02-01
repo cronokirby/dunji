@@ -11,11 +11,11 @@ enum class Floor {
     Tile0, Tile1, Tile2,
     Tile3, Tile4, Tile5,
     Tile6, Tile7,
-    Wall
+    Wall, InvisibleWall
 };
 
 void draw_floor(const SpriteSheet& sheet, Floor tile, int x, int y) {
-    if (tile == Floor::None) return;
+    if (tile == Floor::None || tile == Floor::InvisibleWall) return;
     Rectangle r;
     switch (tile) {
         case Floor::Tile0:
@@ -49,9 +49,14 @@ void draw_floor(const SpriteSheet& sheet, Floor tile, int x, int y) {
     sheet.draw_pxpos(r, Vector2 { (float)x, (float)y });
 }
 
+bool is_wall(Floor tile) {
+    return tile == Floor::Wall || tile == Floor::InvisibleWall;
+}
+
 int closest_index(float f, int res) {
     return (int) (f / res);
 }
+
 
 
 class AreaImpl {
@@ -59,42 +64,52 @@ class AreaImpl {
     int floor_height;
     Floor* floor_tiles;
 public:
-    AreaImpl(int w, int h) : floor_width(w), floor_height(h) {
-        floor_tiles = new Floor[w * h];
-        for (int i = 0; i < w * h; ++i) {
+    AreaImpl(int w, int h) : floor_width(w + 2), floor_height(h + 2) {
+        int size = floor_width * floor_height;
+        floor_tiles = new Floor[size];
+        for (int i = 0; i < size; ++i) {
             floor_tiles[i] = Floor::Tile0;
         }
-        floor_tiles[21] = Floor::Wall;
-        floor_tiles[22] = Floor::Wall;
-        floor_tiles[32] = Floor::Wall;
+        for (int y = 0; y < floor_height; ++y) {
+            floor_tiles[floor_width * y] = Floor::InvisibleWall;
+            floor_tiles[floor_width * y + floor_width - 1] = Floor::InvisibleWall;
+        }
+        for (int x = 0; x < w + 2; ++x) {
+            floor_tiles[x] = Floor::InvisibleWall;
+            floor_tiles[floor_width * (floor_height - 1) + x] = Floor::InvisibleWall;
+        }
+        floor_tiles[27] = Floor::Wall;
+        floor_tiles[28] = Floor::Wall;
+        floor_tiles[39] = Floor::Wall;
     }
 
     ~AreaImpl() {
         delete[] floor_tiles;
     }
 
+
     int allowed_x(int x_mov, Rectangle box) const {
         int min_tile = closest_index(box.y, 48);
         int max_tile = closest_index(box.y + box.height - 1, 48);
-
         bool left = x_mov < 0;
 
-        int distance = 1000000;
+        int distance = x_mov;
         for (int y = min_tile; y <= max_tile; ++y) {
             for (int x = 0; x < floor_width; ++x) {
                 auto tile = floor_tiles[y * floor_width + x];
-                if (tile == Floor::Wall) {
+                if (is_wall(tile)) {
                     int delta;
                     if (left) {
                         delta = (x + 1) * 48 - box.x;
+                        distance = std::max(-abs(delta), distance);
                     } else {
                         delta = x * 48 - (box.x + box.width);
+                        distance = std::min(abs(delta), distance);
                     }
-                    distance = std::min(distance, abs(delta));
                 }
             }
         }
-        return left ? std::max(x_mov, -distance) : std::min(distance, x_mov);
+        return distance;
     }
 
     int allowed_y(int y_mov, Rectangle box) const {
@@ -107,7 +122,7 @@ public:
         for (int x = min_tile; x <= max_tile; ++x) {
             for (int y = 0; y < floor_height; ++y) {
                 auto tile = floor_tiles[y * floor_width + x];
-                if (tile == Floor::Wall) {
+                if (is_wall(tile)) {
                     int delta;
                     if (up) {
                         delta = (y + 1) * 48 - box.y;

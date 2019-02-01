@@ -8,7 +8,7 @@
 
 Player::Player() : 
     sprite(Sprite::Boy1), 
-    pos(Vector2 { 0, 0 }),
+    pos(Vector2 { 120, 120 }),
     walk_timer(0) {}
 
 Sprite::SpriteIDX next_player_walk(Sprite::SpriteIDX player_sprite) {
