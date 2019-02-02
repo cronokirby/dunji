@@ -11,7 +11,8 @@ enum class Floor {
     Tile0, Tile1, Tile2,
     Tile3, Tile4, Tile5,
     Tile6, Tile7,
-    Wall, InvisibleWall
+    Wall0, Wall1, Wall2,
+    InvisibleWall
 };
 
 void draw_floor(const SpriteSheet& sheet, Floor tile, int x, int y) {
@@ -42,15 +43,24 @@ void draw_floor(const SpriteSheet& sheet, Floor tile, int x, int y) {
         case Floor::Tile7:
             r = Rectangle { 2, 6, 1, 1 };
             break;
-        case Floor::Wall:
+        case Floor::Wall0:
             r = Rectangle { 1, 1, 1, 1 };
+            break;
+        case Floor::Wall1:
+            r = Rectangle { 2, 1, 1, 1 };
+            break;
+        case Floor::Wall2:
+            r = Rectangle { 3, 1, 1, 1 };
             break;
     }
     sheet.draw_pxpos(r, Vector2 { (float)x, (float)y });
 }
 
 bool is_wall(Floor tile) {
-    return tile == Floor::Wall || tile == Floor::InvisibleWall;
+    return tile == Floor::Wall0 || 
+           tile == Floor::Wall1 ||
+           tile == Floor::Wall2 ||
+           tile == Floor::InvisibleWall;
 }
 
 int closest_index(float f, int res) {
@@ -78,13 +88,13 @@ public:
             floor_tiles[x] = Floor::InvisibleWall;
             floor_tiles[floor_width * (floor_height - 1) + x] = Floor::InvisibleWall;
         }
-        floor_tiles[27] = Floor::Wall;
-        floor_tiles[28] = Floor::Wall;
-        floor_tiles[29] = Floor::Wall;
-        floor_tiles[30] = Floor::Wall;
-        floor_tiles[31] = Floor::Wall;
-        floor_tiles[41] = Floor::Wall;
-        floor_tiles[39] = Floor::Wall;
+        floor_tiles[27] = Floor::Wall0;
+        floor_tiles[28] = Floor::Wall1;
+        floor_tiles[29] = Floor::Wall1;
+        floor_tiles[30] = Floor::Wall1;
+        floor_tiles[31] = Floor::Wall2;
+        floor_tiles[41] = Floor::Wall0;
+        floor_tiles[39] = Floor::Wall0;
     }
 
     ~AreaImpl() {
