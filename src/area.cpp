@@ -12,12 +12,17 @@ enum class Floor {
     Tile3, Tile4, Tile5,
     Tile6, Tile7,
     Wall0, Wall1, Wall2,
+    WallRightCorner, WallLeftCorner,
+    Edge0, Edge1, Edge2,
+    EdgeRight, EdgeLeft,
+    EdgeRightCorner, EdgeLeftCorner,
     InvisibleWall
 };
 
 void draw_floor(const SpriteSheet& sheet, Floor tile, int x, int y) {
     if (tile == Floor::None || tile == Floor::InvisibleWall) return;
     Rectangle r;
+    bool is_edge = false;
     switch (tile) {
         case Floor::Tile0:
             r = Rectangle { 1, 4, 1, 1 };
@@ -52,7 +57,42 @@ void draw_floor(const SpriteSheet& sheet, Floor tile, int x, int y) {
         case Floor::Wall2:
             r = Rectangle { 3, 1, 1, 1 };
             break;
+        case Floor::WallLeftCorner:
+            r = Rectangle { 5, 9, 1, 1 };
+            break;
+        case Floor::WallRightCorner:
+            r = Rectangle { 4, 9, 1, 1 };
+            break;
+        case Floor::Edge0:
+            r = Rectangle { 1, 0, 1, 1 };
+            is_edge = true;
+            break;
+        case Floor::Edge1:
+            r = Rectangle { 2, 0, 1, 1 };
+            is_edge = true;
+            break;
+        case Floor::Edge2:
+            r = Rectangle { 3, 0, 1, 1 };
+            is_edge = true;
+            break;
+        case Floor::EdgeLeft:
+            r = Rectangle { 1, 8, 1, 1 };
+            is_edge = true;
+            break;
+        case Floor::EdgeRight:
+            r = Rectangle { 0, 8, 1, 1 };
+            is_edge = true;
+            break;
+        case Floor::EdgeLeftCorner:
+            r = Rectangle { 5, 8, 1, 1 };
+            is_edge = true;
+            break;
+        case Floor::EdgeRightCorner:
+            r = Rectangle { 4, 8, 1, 1 };
+            is_edge = true;
+            break;
     }
+    sheet.draw_pxpos(Rectangle { 1, 4, 1, 1 }, Vector2 { (float)x, (float)y });
     sheet.draw_pxpos(r, Vector2 { (float)x, (float)y });
 }
 
@@ -66,7 +106,6 @@ bool is_wall(Floor tile) {
 int closest_index(float f, int res) {
     return (int) (f / res);
 }
-
 
 
 class AreaImpl {
@@ -88,13 +127,24 @@ public:
             floor_tiles[x] = Floor::InvisibleWall;
             floor_tiles[floor_width * (floor_height - 1) + x] = Floor::InvisibleWall;
         }
-        floor_tiles[27] = Floor::Wall0;
-        floor_tiles[28] = Floor::Wall1;
-        floor_tiles[29] = Floor::Wall1;
-        floor_tiles[30] = Floor::Wall1;
-        floor_tiles[31] = Floor::Wall2;
-        floor_tiles[41] = Floor::Wall0;
-        floor_tiles[39] = Floor::Wall0;
+        for (int y = 1; y <= 9; ++y) {
+            floor_tiles[floor_width * y + 1] = Floor::EdgeLeft;
+            floor_tiles[floor_width * y + floor_width - 2] = Floor::EdgeRight;
+        }
+        for (int x = 2; x <= 9; ++x) {
+            floor_tiles[x] = Floor::Edge0;
+            floor_tiles[floor_width * 1 + x] = Floor::Wall1;
+            floor_tiles[floor_width * (floor_height - 1) + x] = Floor::Wall1;
+            floor_tiles[floor_width * (floor_height - 2) + x] = Floor::Edge0;
+        }
+        floor_tiles[floor_width + 1] = Floor::WallLeftCorner;
+        floor_tiles[1] = Floor::Edge0;
+        floor_tiles[floor_width + floor_width - 2] = Floor::WallRightCorner;
+        floor_tiles[floor_width - 2] = Floor::Edge2;
+        floor_tiles[floor_width * (floor_height - 1) + 1] = Floor::Wall0;
+        floor_tiles[floor_width * (floor_height - 2) + 1] = Floor::EdgeLeftCorner;
+        floor_tiles[floor_width * (floor_height - 1) + floor_width - 2] = Floor::Wall2;
+        floor_tiles[floor_width * (floor_height - 2) + floor_width - 2] = Floor::EdgeRightCorner;
     }
 
     ~AreaImpl() {
