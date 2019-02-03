@@ -12,7 +12,8 @@ public:
     ~Area();
 
     Vector2 allowed_move(Vector2, Rectangle) const;
-    void draw(const SpriteSheet&) const;
+    void draw_bottom(const SpriteSheet&) const;
+    void draw_top(const SpriteSheet&) const;
 };
 
 #endif

@@ -19,8 +19,9 @@ int main() {
         ClearBackground(BLACK);
         float dT = GetFrameTime();
         player.update(area, dT);
-        area.draw(sheet);
+        area.draw_bottom(sheet);
         player.draw(sheet);
+        area.draw_top(sheet);
         EndDrawing();
     }
     CloseWindow();

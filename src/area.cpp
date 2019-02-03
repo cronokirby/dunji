@@ -86,6 +86,14 @@ enum class Wall {
     EdgeLeftCorner, EdgeRightCorner
 };
 
+bool is_top_wall(Wall wall) {
+    return wall == Wall::EdgeLeft || 
+           wall == Wall::EdgeMid || 
+           wall == Wall::EdgeRight ||
+           wall == Wall::EdgeLeftCorner ||
+           wall == Wall::EdgeRightCorner;
+}
+
 void draw_wall(const SpriteSheet& sheet, Wall tile, int x, int y) {
     if (tile == Wall::None) return;
     Rectangle r;
@@ -234,14 +242,24 @@ public:
         return y_mov;
     }
 
-    void draw(const SpriteSheet& sheet) const {
-        // the floors and walls have the same height
+    void draw_bottom(const SpriteSheet& sheet) const {
         for (int y = 0; y < floors.height; ++y) {
             for (int x = 0; x < floors.width; ++x) {
                 auto flor = floors.get(x, y);
                 draw_floor(sheet, flor, x, y);
                 auto wall = walls.get(x, y);
                 draw_wall(sheet, wall, x, y);
+            }
+        }
+    }
+
+    void draw_top(const SpriteSheet& sheet) const {
+        for (int y = 0; y < walls.height; ++y) {
+            for (int x = 0; x < walls.width; ++x) {
+                auto wall = walls.get(x, y);
+                if (is_top_wall(wall)) {
+                    draw_wall(sheet, wall, x, y);
+                }
             }
         }
     }
@@ -260,6 +278,10 @@ Vector2 Area::allowed_move(Vector2 move, Rectangle box) const {
     return pimpl->allowed_move(move, box);
 }
 
-void Area::draw(const SpriteSheet& sheet) const {
-    pimpl->draw(sheet);
+void Area::draw_bottom(const SpriteSheet& sheet) const {
+    pimpl->draw_bottom(sheet);
+}
+
+void Area::draw_top(const SpriteSheet& sheet) const {
+    pimpl->draw_top(sheet);
 }
