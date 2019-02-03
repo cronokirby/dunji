@@ -94,6 +94,31 @@ bool is_top_wall(Wall wall) {
            wall == Wall::EdgeRightCorner;
 }
 
+// Returns all coordinates less than 0 if no collision
+Rectangle wall_collision(Wall wall) {
+    switch (wall) {
+        case Wall::Left:
+            return Rectangle { 0, 0, 48, 48 };
+        case Wall::Mid:
+            return Rectangle { 0, 0, 48, 48 };
+        case Wall::Right:
+            return Rectangle { 0, 0, 48, 48 };
+        case Wall::LeftCorner:
+            return Rectangle { 0, 0, 48, 48 };
+        case Wall::RightCorner:
+            return Rectangle { 0, 0, 48, 48 };
+        case Wall::EdgeLeftSide:
+            return Rectangle { 0, 0, 15, 48 };
+        case Wall::EdgeRightSide:
+            return Rectangle { 33, 0, 15, 48 };
+        case Wall::EdgeLeftCorner:
+            return Rectangle { 0, 0, 15, 48 };
+        case Wall::EdgeRightCorner:
+            return Rectangle { 33, 0, 15, 48 };
+    }
+    return Rectangle { -1, -1, -1, -1 };
+}
+
 void draw_wall(const SpriteSheet& sheet, Wall tile, int x, int y) {
     if (tile == Wall::None) return;
     Rectangle r;
@@ -199,13 +224,13 @@ public:
         for (int y = min_tile; y <= max_tile; ++y) {
             for (int x = min_x; x <= max_x; ++x) {
                 auto wall = walls.get(x, y);
-                if (wall == Wall::Left || wall == Wall::Mid || wall == Wall::Right) {
-                    int delta;
+                auto coll = wall_collision(wall);
+                if (coll.x >= 0) {
                     if (left) {
-                        delta = (x + 1) * 48 - box.x;
+                        int delta = x * 48 + coll.x + coll.width - box.x;
                         x_mov = std::max(-abs(delta), x_mov);
                     } else {
-                        delta = x * 48 - (box.x + box.width);
+                        int delta = x * 48 + coll.x - (box.x + box.width);
                         x_mov = std::min(abs(delta), x_mov);
                     }
                 }
@@ -226,17 +251,16 @@ public:
         for (int y = min_y; y <= max_y; ++y) {
             for (int x = min_tile; x <= max_tile; ++x) {
                 auto wall = walls.get(x, y);
-                if (wall == Wall::Left || wall == Wall::Mid || wall == Wall::Right) {
-                    int delta;
+                auto coll = wall_collision(wall);
+                if (coll.x >= 0) {
                     if (up) {
-                        delta = (y + 1) * 48 - box.y;
+                        int delta = y * 48 + coll.y + coll.height - box.y;
                         y_mov = std::max(-abs(delta), y_mov);
                     } else {
-                        delta = y * 48 - (box.y + box.height);
+                        int delta = y * 48 + coll.y - (box.y + box.height);
                         y_mov = std::min(abs(delta), y_mov);
                     }
                 }
-                
             }
         }
         return y_mov;
