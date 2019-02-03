@@ -6,23 +6,47 @@
 #include "../include/graphics.hpp"
 
 
+template <typename T>
+class FixedArr {
+    T* data;
+public:
+    const int width;
+    const int height;
+
+    FixedArr(int w, int h) : width(w), height(h) {
+        data = new T[w * h];
+    }
+
+    ~FixedArr() {
+        delete[] data;
+    }
+
+    inline T get(int x, int y) const {
+        return data[width * y + x];
+    }
+
+    inline void set(int x, int y, T t) {
+        data[width * y + x] = t;
+    }
+
+    inline void set_all(T t) {
+        for (int i = 0; i < width * height; ++i) {
+            data[i] = t;
+        }
+    }
+};
+
+
 enum class Floor {
     None,
     Tile0, Tile1, Tile2,
     Tile3, Tile4, Tile5,
-    Tile6, Tile7,
-    Wall0, Wall1, Wall2,
-    WallRightCorner, WallLeftCorner,
-    Edge0, Edge1, Edge2,
-    EdgeRight, EdgeLeft,
-    EdgeRightCorner, EdgeLeftCorner,
-    InvisibleWall
+    Tile6, Tile7
 };
 
 void draw_floor(const SpriteSheet& sheet, Floor tile, int x, int y) {
-    if (tile == Floor::None || tile == Floor::InvisibleWall) return;
+    if (tile == Floor::None) return;
     Rectangle r;
-    bool is_edge = false;
     switch (tile) {
         case Floor::Tile0:
             r = Rectangle { 1, 4, 1, 1 };
@@ -48,60 +72,64 @@ void draw_floor(const SpriteSheet& sheet, Floor tile, int x, int y) {
         case Floor::Tile7:
             r = Rectangle { 2, 6, 1, 1 };
             break;
-        case Floor::Wall0:
-            r = Rectangle { 1, 1, 1, 1 };
-            break;
-        case Floor::Wall1:
-            r = Rectangle { 2, 1, 1, 1 };
-            break;
-        case Floor::Wall2:
-            r = Rectangle { 3, 1, 1, 1 };
-            break;
-        case Floor::WallLeftCorner:
-            r = Rectangle { 5, 9, 1, 1 };
-            break;
-        case Floor::WallRightCorner:
-            r = Rectangle { 4, 9, 1, 1 };
-            break;
-        case Floor::Edge0:
-            r = Rectangle { 1, 0, 1, 1 };
-            is_edge = true;
-            break;
-        case Floor::Edge1:
-            r = Rectangle { 2, 0, 1, 1 };
-            is_edge = true;
-            break;
-        case Floor::Edge2:
-            r = Rectangle { 3, 0, 1, 1 };
-            is_edge = true;
-            break;
-        case Floor::EdgeLeft:
-            r = Rectangle { 1, 8, 1, 1 };
-            is_edge = true;
-            break;
-        case Floor::EdgeRight:
-            r = Rectangle { 0, 8, 1, 1 };
-            is_edge = true;
-            break;
-        case Floor::EdgeLeftCorner:
-            r = Rectangle { 5, 8, 1, 1 };
-            is_edge = true;
-            break;
-        case Floor::EdgeRightCorner:
-            r = Rectangle { 4, 8, 1, 1 };
-            is_edge = true;
-            break;
     }
-    sheet.draw_pxpos(Rectangle { 1, 4, 1, 1 }, Vector2 { (float)x, (float)y });
     sheet.draw_pxpos(r, Vector2 { (float)x, (float)y });
 }
 
-bool is_wall(Floor tile) {
-    return tile == Floor::Wall0 || 
-           tile == Floor::Wall1 ||
-           tile == Floor::Wall2 ||
-           tile == Floor::InvisibleWall;
+
+enum class Wall {
+    None,
+    Left, Mid, Right,
+    LeftCorner, RightCorner,
+    EdgeLeft, EdgeMid, EdgeRight,
+    EdgeLeftSide, EdgeRightSide,
+    EdgeLeftCorner, EdgeRightCorner
+};
+
+void draw_wall(const SpriteSheet& sheet, Wall tile, int x, int y) {
+    if (tile == Wall::None) return;
+    Rectangle r;
+    switch (tile) {
+        case Wall::Left:
+            r = Rectangle { 1, 1, 1, 1 };
+            break;
+        case Wall::Mid:
+            r = Rectangle { 2, 1, 1, 1 };
+            break;
+        case Wall::Right:
+            r = Rectangle { 3, 1, 1, 1 };
+            break;
+        case Wall::LeftCorner:
+            r = Rectangle { 5, 9, 1, 1 };
+            break;
+        case Wall::RightCorner:
+            r = Rectangle { 4, 9, 1, 1 };
+            break;
+        case Wall::EdgeLeft:
+            r = Rectangle { 1, 0, 1, 1 };
+            break;
+        case Wall::EdgeMid:
+            r = Rectangle { 2, 0, 1, 1 };
+            break;
+        case Wall::EdgeRight:
+            r = Rectangle { 3, 0, 1, 1 };
+            break;
+        case Wall::EdgeLeftSide:
+            r = Rectangle { 1, 8, 1, 1 };
+            break;
+        case Wall::EdgeRightSide:
+            r = Rectangle { 0, 8, 1, 1 };
+            break;
+        case Wall::EdgeLeftCorner:
+            r = Rectangle { 5, 8, 1, 1 };
+            break;
+        case Wall::EdgeRightCorner:
+            r = Rectangle { 4, 8, 1, 1 };
+            break;
+    }
+    sheet.draw_pxpos(r, Vector2 { (float)x, (float)y });
 }
+
 
 int closest_index(float f, int res) {
     return (int) (f / res);
@@ -109,48 +137,36 @@ int closest_index(float f, int res) {
 
 
 class AreaImpl {
-    int floor_width;
-    int floor_height;
-    Floor* floor_tiles;
+    FixedArr<Floor> floors;
+    FixedArr<Wall> walls;
 public:
-    AreaImpl(int w, int h) : floor_width(w + 2), floor_height(h + 2) {
-        int size = floor_width * floor_height;
-        floor_tiles = new Floor[size];
-        for (int i = 0; i < size; ++i) {
-            floor_tiles[i] = Floor::Tile0;
+    AreaImpl(int w, int h) : floors(w, h), walls(w, h) {
+        floors.set_all(Floor::None);
+        for (int y = 1; y < floors.height; ++y) {
+            for (int x = 0; x < floors.width; ++x) {
+                floors.set(x, y, Floor::Tile0);
+            }
         }
-        for (int y = 0; y < floor_height; ++y) {
-            floor_tiles[floor_width * y] = Floor::InvisibleWall;
-            floor_tiles[floor_width * y + floor_width - 1] = Floor::InvisibleWall;
+        for (int x = 1; x < walls.width - 1; ++x) {
+            walls.set(x, 0, Wall::EdgeMid);
+            walls.set(x, 1, Wall::Mid);
+            walls.set(x, walls.height - 1, Wall::Mid);
+            walls.set(x, walls.height - 2, Wall::EdgeMid);
         }
-        for (int x = 0; x < w + 2; ++x) {
-            floor_tiles[x] = Floor::InvisibleWall;
-            floor_tiles[floor_width * (floor_height - 1) + x] = Floor::InvisibleWall;
+        std::cout << (int)floors.get(2, 0) << "\n";
+        for (int y = 1; y < walls.height - 2; ++y) {
+            walls.set(0, y, Wall::EdgeLeftSide);
+            walls.set(walls.width - 1, y, Wall::EdgeRightSide);
         }
-        for (int y = 1; y <= 9; ++y) {
-            floor_tiles[floor_width * y + 1] = Floor::EdgeLeft;
-            floor_tiles[floor_width * y + floor_width - 2] = Floor::EdgeRight;
-        }
-        for (int x = 2; x <= 9; ++x) {
-            floor_tiles[x] = Floor::Edge0;
-            floor_tiles[floor_width * 1 + x] = Floor::Wall1;
-            floor_tiles[floor_width * (floor_height - 1) + x] = Floor::Wall1;
-            floor_tiles[floor_width * (floor_height - 2) + x] = Floor::Edge0;
-        }
-        floor_tiles[floor_width + 1] = Floor::WallLeftCorner;
-        floor_tiles[1] = Floor::Edge0;
-        floor_tiles[floor_width + floor_width - 2] = Floor::WallRightCorner;
-        floor_tiles[floor_width - 2] = Floor::Edge2;
-        floor_tiles[floor_width * (floor_height - 1) + 1] = Floor::Wall0;
-        floor_tiles[floor_width * (floor_height - 2) + 1] = Floor::EdgeLeftCorner;
-        floor_tiles[floor_width * (floor_height - 1) + floor_width - 2] = Floor::Wall2;
-        floor_tiles[floor_width * (floor_height - 2) + floor_width - 2] = Floor::EdgeRightCorner;
+        walls.set(0, walls.height - 2, Wall::EdgeLeftCorner);
+        walls.set(0, walls.height - 1, Wall::Left);
+        walls.set(0, 1, Wall::LeftCorner);
+        walls.set(0, 0, Wall::EdgeLeft);
+        walls.set(walls.width - 1, walls.height - 2, Wall::EdgeRightCorner);
+        walls.set(walls.width - 1, walls.height - 1, Wall::Right);
+        walls.set(walls.width - 1, 1, Wall::RightCorner);
+        walls.set(walls.width - 1, 0, Wall::EdgeRight);
     }
-
-    ~AreaImpl() {
-        delete[] floor_tiles;
-    }
-
 
     Vector2 allowed_move(Vector2 mov, Rectangle box) const {
         if (mov.x != 0) {
@@ -174,8 +190,8 @@ public:
         int max_x = closest_index(left ? right_x : right_x + x_mov, 48);
         for (int y = min_tile; y <= max_tile; ++y) {
             for (int x = min_x; x <= max_x; ++x) {
-                auto tile = floor_tiles[y * floor_width + x];
-                if (is_wall(tile)) {
+                auto wall = walls.get(x, y);
+                if (wall == Wall::Left || wall == Wall::Mid || wall == Wall::Right) {
                     int delta;
                     if (left) {
                         delta = (x + 1) * 48 - box.x;
@@ -201,8 +217,8 @@ public:
         int max_y = closest_index(up ? down_y : down_y + y_mov, 48);
         for (int y = min_y; y <= max_y; ++y) {
             for (int x = min_tile; x <= max_tile; ++x) {
-                auto tile = floor_tiles[y * floor_width + x];
-                if (is_wall(tile)) {
+                auto wall = walls.get(x, y);
+                if (wall == Wall::Left || wall == Wall::Mid || wall == Wall::Right) {
                     int delta;
                     if (up) {
                         delta = (y + 1) * 48 - box.y;
@@ -212,16 +228,20 @@ public:
                         y_mov = std::min(abs(delta), y_mov);
                     }
                 }
+                
             }
         }
         return y_mov;
     }
 
     void draw(const SpriteSheet& sheet) const {
-        for (int y = 0; y < floor_height; ++y) {
-            for (int x = 0; x < floor_width; ++x) {
-                auto tile = floor_tiles[y * floor_width + x];
-                draw_floor(sheet, tile, x, y);
+        // the floors and walls have the same height
+        for (int y = 0; y < floors.height; ++y) {
+            for (int x = 0; x < floors.width; ++x) {
+                auto flor = floors.get(x, y);
+                draw_floor(sheet, flor, x, y);
+                auto wall = walls.get(x, y);
+                draw_wall(sheet, wall, x, y);
             }
         }
     }
