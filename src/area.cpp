@@ -248,27 +248,6 @@ public:
                 }
             }
         }
-        /*
-        int right_x = box.x + box.width - 1;
-
-        int min_x = closest_index(left ? box.x + x_mov : box.x, 48);
-        int max_x = closest_index(left ? right_x : right_x + x_mov, 48);
-        for (int y = min_tile; y <= max_tile; ++y) {
-            for (int x = min_x; x <= max_x; ++x) {
-                auto wall = walls.get(x, y);
-                auto coll = wall_collision(wall);
-                if (coll.x >= 0) {
-                    if (left) {
-                        int delta = x * 48 + coll.x + coll.width - box.x;
-                        x_mov = std::max(-abs(delta), x_mov);
-                    } else {
-                        int delta = x * 48 + coll.x - (box.x + box.width);
-                        x_mov = std::min(abs(delta), x_mov);
-                    }
-                }
-            }
-        }
-        */
         return x_mov;
     }
 
@@ -316,29 +295,7 @@ public:
                 }
             }
         }
-
-        /*
-        int down_y = box.y + box.height - 1;
-
-        int min_y = closest_index(up ? box.y + y_mov : box.y, 48);
-        int max_y = closest_index(up ? down_y : down_y + y_mov, 48);
-        for (int y = min_y; y <= max_y; ++y) {
-            for (int x = min_tile; x <= max_tile; ++x) {
-                auto wall = walls.get(x, y);
-                auto coll = wall_collision(wall);
-                if (coll.x >= 0) {
-                    if (up) {
-                        float delta = y * 48 + coll.y + coll.height - box.y;
-                        y_mov = std::max(-abs(delta), y_mov);
-                    } else {
-                        float delta = y * 48 + coll.y - (box.y + box.height);
-                        y_mov = std::min(abs(delta), y_mov);
-                    }
-                }
-            }
-        }
-        */
-        return y_mov;
+       return y_mov;
     }
 
     void draw_bottom(const SpriteSheet& sheet) const {
