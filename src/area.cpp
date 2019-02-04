@@ -222,14 +222,14 @@ public:
         bool left = x_mov < 0;
 
         if (left) {
+            int min_x = closest_index(box.x + x_mov, 48);
             for (int y = min_tile; y <= max_tile; ++y) {
-                int min_x = closest_index(box.x + x_mov, 48);
                 for (int x = min_x;;++x) {
                     auto wall = walls.get(x, y);
                     auto coll = wall_collision(wall);
                     if (coll.x >= 0) {
                         int wall_x = x * 48 + coll.x + coll.width;
-                        if (wall_x > box.x) break;
+                        if (wall_x > box.x + 1.0) break;
                         x_mov = std::max(wall_x - box.x, x_mov);
                     }
                 }
@@ -242,7 +242,7 @@ public:
                     auto coll = wall_collision(wall);
                     if (coll.x >= 0) {
                         int wall_x = x * 48 + coll.x;
-                        if (wall_x < box.x) break;
+                        if (wall_x + 1.0 < box.x) break;
                         x_mov = std::min(wall_x - (box.x + box.width), x_mov);
                     }
                 }
@@ -267,7 +267,7 @@ public:
                     if (coll.y >= 0) {
                         // End if the wall is behind us
                         int wall_y = y * 48 + coll.y + coll.height;
-                        if (wall_y > box.y) break;
+                        if (wall_y > box.y + 1.0) break;
                         // Skip if we're not colliding horizontally
                         int left_edge = x * 48 + coll.x;
                         int right_edge = left_edge + coll.width;
@@ -284,7 +284,7 @@ public:
                     auto coll = wall_collision(wall);
                     if (coll.y >= 0) {
                         int wall_y = y * 48 + coll.y;
-                        if (wall_y < box.y) break;
+                        if (wall_y + 1.0 < box.y) break;
                         // Skip if we're not colliding horizontally
                         int left_edge = x * 48 + coll.x;
                         int right_edge = left_edge + coll.width;
