@@ -199,6 +199,10 @@ public:
         walls.set(walls.width - 1, walls.height - 1, Wall::Right);
         walls.set(walls.width - 1, 1, Wall::RightCorner);
         walls.set(walls.width - 1, 0, Wall::EdgeRight);
+
+        walls.set(2, 2, Wall::Mid);
+        walls.set(4, 4, Wall::EdgeLeftSide);
+        walls.set(4, 5, Wall::EdgeLeftSide);
     }
 
     Vector2 allowed_move(Vector2 mov, Rectangle box) const {
@@ -212,11 +216,39 @@ public:
     }
 
 
-    int allowed_x(int x_mov, Rectangle box) const {
+    float allowed_x(float x_mov, Rectangle box) const {
         int min_tile = closest_index(box.y, 48);
         int max_tile = closest_index(box.y + box.height - 1, 48);
         bool left = x_mov < 0;
 
+        if (left) {
+            for (int y = min_tile; y <= max_tile; ++y) {
+                int min_x = closest_index(box.x + x_mov, 48);
+                for (int x = min_x;;++x) {
+                    auto wall = walls.get(x, y);
+                    auto coll = wall_collision(wall);
+                    if (coll.x >= 0) {
+                        int wall_x = x * 48 + coll.x + coll.width;
+                        if (wall_x > box.x) break;
+                        x_mov = std::max(wall_x - box.x, x_mov);
+                    }
+                }
+            }
+        } else {
+            for (int y = min_tile; y <= max_tile; ++y) {
+                int max_x = closest_index(box.x + box.width + x_mov, 48);
+                for (int x = max_x;; --x) {
+                    auto wall = walls.get(x, y);
+                    auto coll = wall_collision(wall);
+                    if (coll.x >= 0) {
+                        int wall_x = x * 48 + coll.x;
+                        if (wall_x < box.x) break;
+                        x_mov = std::min(wall_x - (box.x + box.width), x_mov);
+                    }
+                }
+            }
+        }
+        /*
         int right_x = box.x + box.width - 1;
 
         int min_x = closest_index(left ? box.x + x_mov : box.x, 48);
@@ -236,14 +268,63 @@ public:
                 }
             }
         }
+        */
         return x_mov;
     }
 
-    int allowed_y(int y_mov, Rectangle box) const {
+    float allowed_y(float y_mov, Rectangle box) const {
         int min_tile = closest_index(box.x, 48);
         int max_tile = closest_index(box.x + box.width - 1, 48);
         bool up = y_mov < 0;
 
+        if (up) {
+            for (int x = min_tile; x <= max_tile; ++x) {
+
+                int min_y = closest_index(box.y + y_mov, 48);
+                int max_y = closest_index(box.y + box.height, 48);
+                for (int y = min_y; y <= max_y; ++y)  {
+                    auto wall = walls.get(x, y);
+                    auto coll = wall_collision(wall);
+                    if (coll.y >= 0) {
+                        // End if the wall is behind us
+                        int wall_y = y * 48 + coll.y + coll.height;
+                        if (wall_y > box.y) break;
+                        // Skip if we're not colliding horizontally
+                        int left_edge = x * 48 + coll.x;
+                        int right_edge = left_edge + coll.width;
+                        int right_x = box.x + box.width;
+                        bool left_coll = box.x > left_edge && box.x <= right_edge;
+                        bool right_coll = right_x > left_edge && right_x <= right_edge;
+                        if (!(left_coll || right_coll)) continue;
+
+                        y_mov = std::max(wall_y - box.y, y_mov);
+                    }
+                }
+            }
+        } else {
+            for (int x = min_tile; x <= max_tile; ++x) {
+                int max_y = closest_index(box.y + box.height + y_mov, 48);
+                for (int y = max_y;; --y) {
+                    auto wall = walls.get(x, y);
+                    auto coll = wall_collision(wall);
+                    if (coll.y >= 0) {
+                        int wall_y = y * 48 + coll.y;
+                        if (wall_y < box.y) break;
+                        // Skip if we're not colliding horizontally
+                        int left_edge = x * 48 + coll.x;
+                        int right_edge = left_edge + coll.width;
+                        int right_x = box.x + box.width;
+                        bool left_coll = box.x > left_edge && box.x <= right_edge;
+                        bool right_coll = right_x > left_edge && right_x <= right_edge;
+                        if (!(left_coll || right_coll)) continue;
+
+                        y_mov = std::min(wall_y - (box.y + box.height), y_mov);
+                    }
+                }
+            }
+        }
+
+        /*
         int down_y = box.y + box.height - 1;
 
         int min_y = closest_index(up ? box.y + y_mov : box.y, 48);
@@ -254,15 +335,16 @@ public:
                 auto coll = wall_collision(wall);
                 if (coll.x >= 0) {
                     if (up) {
-                        int delta = y * 48 + coll.y + coll.height - box.y;
+                        float delta = y * 48 + coll.y + coll.height - box.y;
                         y_mov = std::max(-abs(delta), y_mov);
                     } else {
-                        int delta = y * 48 + coll.y - (box.y + box.height);
+                        float delta = y * 48 + coll.y - (box.y + box.height);
                         y_mov = std::min(abs(delta), y_mov);
                     }
                 }
             }
         }
+        */
         return y_mov;
     }
 

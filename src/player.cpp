@@ -9,7 +9,12 @@
 Player::Player() : 
     sprite(Sprite::Boy1), 
     pos(Vector2 { 100, 100 }),
-    walk_timer(0) {}
+    walk_timer(0) 
+{
+    auto image = GenImageColor(48, 48, GREEN);
+    real_sprite = LoadTextureFromImage(image);
+}
+
 
 Sprite::SpriteIDX next_player_walk(Sprite::SpriteIDX player_sprite) {
     switch (player_sprite) {
@@ -25,7 +30,7 @@ Sprite::SpriteIDX next_player_walk(Sprite::SpriteIDX player_sprite) {
 }
 
 Rectangle player_walk_box(Vector2 pos) {
-    return Rectangle { pos.x + 7, pos.y + 60, 32, 36 };
+    return Rectangle { pos.x, pos.y, 48, 48 };
 }
 
 
@@ -45,6 +50,9 @@ void Player::update(const Area& area, float dT) {
     }
     float length = sqrt(direction.x * direction.x + direction.y * direction.y);
     float stretch = 400 * dT / length;
+    if (IsKeyDown(KEY_LEFT_SHIFT)) {
+        stretch /= 80;
+    }
     // This is mainly to avoid the case where the length is 0, and we blow up
     if (length >= 1) {
         Vector2 try_move { direction.x * stretch, direction.y * stretch };
@@ -65,5 +73,6 @@ void Player::update(const Area& area, float dT) {
 }
 
 void Player::draw(const SpriteSheet& sheet) const {
-    sprite.draw(sheet, pos);
+    //sprite.draw(sheet, pos);
+    DrawTexture(real_sprite, pos.x, pos.y, WHITE);
 }

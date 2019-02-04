@@ -5,11 +5,13 @@ class Area;
 class Sprite;
 class SpriteSheet;
 class Vector2;
+class Texture2D;
 
 
 class Player {
     Vector2 pos;
     Sprite sprite;
+    Texture2D real_sprite;
     int walk_timer;
 public:
     Player();
