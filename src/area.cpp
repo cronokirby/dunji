@@ -292,11 +292,7 @@ public:
                         // Skip if we're not colliding horizontally
                         int left_edge = x * 48 + coll.x;
                         int right_edge = left_edge + coll.width;
-                        int right_x = box.x + box.width;
-                        bool left_coll = box.x > left_edge && box.x <= right_edge;
-                        bool right_coll = right_x > left_edge && right_x <= right_edge;
-                        if (!(left_coll || right_coll)) continue;
-
+                        if (!(box.x < right_edge && left_edge < box.x + box.width)) continue;
                         y_mov = std::max(wall_y - box.y, y_mov);
                     }
                 }
@@ -313,10 +309,7 @@ public:
                         // Skip if we're not colliding horizontally
                         int left_edge = x * 48 + coll.x;
                         int right_edge = left_edge + coll.width;
-                        int right_x = box.x + box.width;
-                        bool left_coll = box.x > left_edge && box.x <= right_edge;
-                        bool right_coll = right_x > left_edge && right_x <= right_edge;
-                        if (!(left_coll || right_coll)) continue;
+                        if (!(box.x < right_edge && left_edge < box.x + box.width)) continue;
 
                         y_mov = std::min(wall_y - (box.y + box.height), y_mov);
                     }

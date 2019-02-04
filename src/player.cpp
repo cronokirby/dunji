@@ -8,12 +8,8 @@
 
 Player::Player() : 
     sprite(Sprite::Boy1), 
-    pos(Vector2 { 100, 100 }),
-    walk_timer(0) 
-{
-    auto image = GenImageColor(48, 48, GREEN);
-    real_sprite = LoadTextureFromImage(image);
-}
+    pos(Vector2 { 100, 150 }),
+    walk_timer(0) {}
 
 
 Sprite::SpriteIDX next_player_walk(Sprite::SpriteIDX player_sprite) {
@@ -30,7 +26,7 @@ Sprite::SpriteIDX next_player_walk(Sprite::SpriteIDX player_sprite) {
 }
 
 Rectangle player_walk_box(Vector2 pos) {
-    return Rectangle { pos.x, pos.y, 48, 48 };
+    return Rectangle { pos.x + 9, pos.y + 48 + 21, 48 - 18, 48 - 21 };
 }
 
 
@@ -73,6 +69,5 @@ void Player::update(const Area& area, float dT) {
 }
 
 void Player::draw(const SpriteSheet& sheet) const {
-    //sprite.draw(sheet, pos);
-    DrawTexture(real_sprite, pos.x, pos.y, WHITE);
+    sprite.draw(sheet, pos);
 }
