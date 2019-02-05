@@ -53,6 +53,8 @@ Rectangle sprite_source(const Sprite::SpriteIDX sprite) {
             return Rectangle { 14, 4, 1, 2 };
         case Sprite::Boy8:
             return Rectangle { 15, 4, 1, 2 };
+        case Sprite::Knife:
+            return Rectangle { 19, 6, 1, 2 };
     }
 }
 

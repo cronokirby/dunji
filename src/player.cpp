@@ -6,8 +6,29 @@
 #include "../include/player.hpp"
 
 
+Weapon::Weapon() : sprite(Sprite::Knife) {
+        offset = Vector2 { 24, 40 };
+    }
+
+    void Weapon::set_orientation(Sprite::Orientation o) {
+        sprite.orientation = o;
+        if (o == Sprite::Orientation::Left) {
+            offset.x = -24;
+        } else {
+            offset.x = 24;
+        }
+    }
+
+    void Weapon::draw(const SpriteSheet& sheet, Vector2 pos) const {
+        pos.x += offset.x;
+        pos.y += offset.y;
+        sprite.draw(sheet, pos);
+    }
+
+
 Player::Player() : 
     sprite(Sprite::Boy1), 
+    weapon(Weapon()),
     pos(Vector2 { 100, 150 }),
     walk_timer(0) {}
 
@@ -39,6 +60,8 @@ void Player::update(const Area& area, float dT) {
         direction.x = 1;
         sprite.orientation = Sprite::Right;
     }
+    weapon.set_orientation(sprite.orientation);
+
     if (IsKeyDown(KEY_W)) {
         direction.y = -1;
     } else if (IsKeyDown(KEY_S)) {
@@ -69,5 +92,6 @@ void Player::update(const Area& area, float dT) {
 }
 
 void Player::draw(const SpriteSheet& sheet) const {
+    weapon.draw(sheet, pos);
     sprite.draw(sheet, pos);
 }
