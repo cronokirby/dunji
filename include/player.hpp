@@ -9,9 +9,11 @@ class Vector2;
 class Weapon {
     Sprite sprite;
     Vector2 offset;
+    float rotation;
 public:
     Weapon();
     void set_orientation(Sprite::Orientation);
+    void update(float);
     void draw(const SpriteSheet&, Vector2) const;
 };
 

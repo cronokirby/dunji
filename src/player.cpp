@@ -7,22 +7,31 @@
 
 
 Weapon::Weapon() : sprite(Sprite::Knife) {
-        offset = Vector2 { 24, 40 };
+        offset = Vector2 { 48, 78 };
+        rotation = 0.0;
     }
 
     void Weapon::set_orientation(Sprite::Orientation o) {
         sprite.orientation = o;
         if (o == Sprite::Orientation::Left) {
-            offset.x = -24;
+            offset.x = 0;
         } else {
-            offset.x = 24;
+            offset.x = 48;
+        }
+    }
+
+    void Weapon::update(float dT) {
+        rotation += 90 * dT;
+        if (rotation >= 90.0) {
+            rotation = 0;
         }
     }
 
     void Weapon::draw(const SpriteSheet& sheet, Vector2 pos) const {
         pos.x += offset.x;
         pos.y += offset.y;
-        sprite.draw_rotated(sheet, pos, Vector2 { 0, 0 }, 0);
+        auto rot = sprite.orientation == Sprite::Orientation::Left ? -rotation : rotation;
+        sprite.draw_rotated(sheet, pos, Vector2 { 24, 36 }, rot);
     }
 
 
@@ -89,6 +98,8 @@ void Player::update(const Area& area, float dT) {
         walk_timer = 0;
         sprite.sprite_i = Sprite::Boy1;
     }
+
+    weapon.update(dT);
 }
 
 void Player::draw(const SpriteSheet& sheet) const {
