@@ -22,7 +22,7 @@ Weapon::Weapon() : sprite(Sprite::Knife) {
     void Weapon::draw(const SpriteSheet& sheet, Vector2 pos) const {
         pos.x += offset.x;
         pos.y += offset.y;
-        sprite.draw(sheet, pos);
+        sprite.draw_rotated(sheet, pos, Vector2 { 0, 0 }, 0);
     }
 
 

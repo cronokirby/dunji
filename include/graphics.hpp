@@ -15,6 +15,7 @@ public:
     ~SpriteSheet();
     void draw(Rectangle px_source, Vector2 pos) const;
     void draw_pxpos(Rectangle px_source, Vector2 pos) const;
+    void draw_rotated(Rectangle, Vector2, Vector2, float) const;
 };
 
 
@@ -39,6 +40,7 @@ struct Sprite {
     Sprite(SpriteIDX s, Orientation o);
 
     void draw(const SpriteSheet& sheet, Vector2 pos) const;
+    void draw_rotated(const SpriteSheet&, Vector2, Vector2, float) const;
 };
 
 #endif

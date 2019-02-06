@@ -14,19 +14,25 @@ SpriteSheet::~SpriteSheet() {
     UnloadTexture(texture);
 }
 
+Rectangle get_source(int scale, Rectangle r) {
+    return Rectangle { scale * r.x, scale * r.y, scale * r.width, scale * r.height };
+}
+
 void SpriteSheet::draw(Rectangle px_source, Vector2 pos) const {
-    auto source = Rectangle { 
-        px_scale * px_source.x,
-        px_scale * px_source.y,
-        px_scale * px_source.width,
-        px_scale * px_source.height,
-    };
+    auto source = get_source(px_scale, px_source);
     DrawTextureRec(texture, source, pos, WHITE);
 }
 
 void SpriteSheet::draw_pxpos(Rectangle px_source, Vector2 px_pos) const {
     auto scaled = Vector2 { px_pos.x * px_scale, px_pos.y * px_scale };
     draw(px_source, scaled);
+}
+
+void SpriteSheet::draw_rotated(Rectangle px_source, Vector2 pos, Vector2 origin, float rot) const {
+    auto source = get_source(px_scale, px_source);
+    auto dest = Rectangle { pos.x, pos.y, source.width, source.height };
+    auto origi = Vector2 { source.width, source.height };
+    DrawTexturePro(texture, source, dest, origin, rot, WHITE);
 }
 
 
@@ -58,10 +64,20 @@ Rectangle sprite_source(const Sprite::SpriteIDX sprite) {
     }
 }
 
-void Sprite::draw(const SpriteSheet& sheet, Vector2 pos) const {
+Rectangle get_source(Sprite::SpriteIDX sprite_i, Sprite::Orientation o) {
     Rectangle px_source = sprite_source(sprite_i);
-    if (orientation == Left) {
+    if (o == Sprite::Left) {
         px_source.y += 2;
     }
+    return px_source;
+}
+
+void Sprite::draw(const SpriteSheet& sheet, Vector2 pos) const {
+    Rectangle px_source = get_source(sprite_i, orientation);
     sheet.draw(px_source, pos);
+}
+
+void Sprite::draw_rotated(const SpriteSheet& sheet, Vector2 pos, Vector2 origin, float rot) const {
+    Rectangle px_source = get_source(sprite_i, orientation);
+    sheet.draw_rotated(px_source, pos, origin, rot);
 }
