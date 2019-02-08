@@ -1,7 +1,9 @@
 #include <iostream>
+#include <memory>
 #include "../include/raylib.h"
 
 #include "../include/area.hpp"
+#include "../include/enemies.hpp"
 #include "../include/graphics.hpp"
 #include "../include/player.hpp"
 
@@ -12,6 +14,7 @@ int main() {
     SpriteSheet sheet(3, "../res/dunji-sheet.png");
     Player player {};
     Area area(10, 10);
+    area.add_enemy(std::unique_ptr<Enemy> (new SqSprout));
 
     SetTargetFPS(60);
     while (!WindowShouldClose()) {

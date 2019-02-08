@@ -1,8 +1,11 @@
 #include <algorithm>
 #include <iostream>
 #include <math.h>
+#include <memory>
+#include <vector>
 #include "../include/raylib.h"
 #include "../include/area.hpp"
+#include "../include/enemies.hpp"
 #include "../include/graphics.hpp"
 
 
@@ -172,8 +175,9 @@ int closest_index(float f, int res) {
 class AreaImpl {
     FixedArr<Floor> floors;
     FixedArr<Wall> walls;
+    std::vector<std::unique_ptr<Enemy>> enemies;
 public:
-    AreaImpl(int w, int h) : floors(w, h), walls(w, h) {
+    AreaImpl(int w, int h) : floors(w, h), walls(w, h) , enemies(0) {
         floors.set_all(Floor::None);
         for (int y = 1; y < floors.height; ++y) {
             for (int x = 0; x < floors.width; ++x) {
@@ -307,6 +311,10 @@ public:
                 draw_wall(sheet, wall, x, y);
             }
         }
+
+        for (auto& e : enemies) {
+            e->draw(sheet);
+        }
     }
 
     void draw_top(const SpriteSheet& sheet) const {
@@ -318,6 +326,10 @@ public:
                 }
             }
         }
+    }
+
+    void add_enemy(std::unique_ptr<Enemy> e) {
+        enemies.push_back(std::move(e));
     }
 };
 
@@ -340,4 +352,8 @@ void Area::draw_bottom(const SpriteSheet& sheet) const {
 
 void Area::draw_top(const SpriteSheet& sheet) const {
     pimpl->draw_top(sheet);
+}
+
+void Area::add_enemy(std::unique_ptr<Enemy> e) {
+    pimpl->add_enemy(std::move(e));
 }

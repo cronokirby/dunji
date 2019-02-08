@@ -25,6 +25,9 @@ public:
 struct Sprite {
     enum SpriteIDX {
         Boy0, Boy1, Boy2, Boy3, Boy4, Boy5, Boy6, Boy7, Boy8,
+        SqSprout0, SqSprout1, SqSprout2, SqSprout3,
+        SqSprout4, SqSprout5, SqSprout6, SqSprout7,
+        SqSprout8,
         Knife
     };
 

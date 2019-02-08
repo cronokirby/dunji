@@ -61,6 +61,24 @@ Rectangle sprite_source(const Sprite::SpriteIDX sprite) {
             return Rectangle { 15, 4, 1, 2 };
         case Sprite::Knife:
             return Rectangle { 19, 6, 1, 2 };
+        case Sprite::SqSprout0:
+            return Rectangle { 0, 30, 1, 1 };
+        case Sprite::SqSprout1:
+            return Rectangle { 1, 30, 1, 1 };
+        case Sprite::SqSprout2:
+            return Rectangle { 2, 30, 1, 1 };
+        case Sprite::SqSprout3:
+            return Rectangle { 3, 30, 1, 1 };
+        case Sprite::SqSprout4:
+            return Rectangle { 4, 30, 1, 1 };
+        case Sprite::SqSprout5:
+            return Rectangle { 5, 30, 1, 1 };
+        case Sprite::SqSprout6:
+            return Rectangle { 6, 30, 1, 1 };
+        case Sprite::SqSprout7:
+            return Rectangle { 7, 30, 1, 1 };
+        case Sprite::SqSprout8:
+            return Rectangle { 8, 30, 1, 1 };
     }
 }
 
